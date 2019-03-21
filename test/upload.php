@@ -9,6 +9,8 @@ include('../src/class.upload.php');
 $dir_dest = (isset($_GET['dir']) ? $_GET['dir'] : 'tmp');
 $dir_pics = (isset($_GET['pics']) ? $_GET['pics'] : $dir_dest);
 
+$log = '';
+
 ?>
 
 
@@ -69,7 +71,7 @@ if ($action == 'simple') {
     // we create an instance of the class, giving as argument the PHP object
     // corresponding to the file field from the form
     // All the uploads are accessible from the PHP object $_FILES
-    $handle = new Upload($_FILES['my_field']);
+    $handle = new upload($_FILES['my_field']);
 
     // then we check if the file has been uploaded properly
     // in its *temporary* location in the server (often, it is /tmp)
@@ -78,8 +80,8 @@ if ($action == 'simple') {
         // yes, the file is on the server
         // now, we start the upload 'process'. That is, to copy the uploaded file
         // from its temporary location to the wanted location
-        // It could be something like $handle->Process('/home/www/my_uploads/');
-        $handle->Process($dir_dest);
+        // It could be something like $handle->process('/home/www/my_uploads/');
+        $handle->process($dir_dest);
 
         // we check if everything went OK
         if ($handle->processed) {
@@ -98,7 +100,7 @@ if ($action == 'simple') {
         }
 
         // we delete the temporary files
-        $handle-> Clean();
+        $handle-> clean();
 
     } else {
         // if we're here, the upload file failed for some reasons
@@ -109,19 +111,21 @@ if ($action == 'simple') {
         echo '</p>';
     }
 
+    $log .= $handle->log . '<br />';
+
 
 } else if ($action == 'base64') {
 
     // ---------- BASE64 FILE ----------
 
     // we create an instance of the class, giving as argument the data string
-    $handle = new Upload((isset($_POST['my_field']) ? $_POST['my_field'] : (isset($_GET['file']) ? $_GET['file'] : '')));
+    $handle = new upload((isset($_POST['my_field']) ? $_POST['my_field'] : (isset($_GET['file']) ? $_GET['file'] : '')));
 
     // check if a temporary file has been created with the file data
     if ($handle->uploaded) {
 
         // yes, the file is on the server
-        $handle->Process($dir_dest);
+        $handle->process($dir_dest);
 
         // we check if everything went OK
         if ($handle->processed) {
@@ -140,7 +144,7 @@ if ($action == 'simple') {
         }
 
         // we delete the temporary files
-        $handle-> Clean();
+        $handle-> clean();
 
     } else {
         // if we're here, the file failed for some reasons
@@ -150,6 +154,8 @@ if ($action == 'simple') {
         echo '</p>';
     }
 
+    $log .= $handle->log . '<br />';
+
 } else if ($action == 'image') {
 
     // ---------- IMAGE UPLOAD ----------
@@ -157,7 +163,7 @@ if ($action == 'simple') {
     // we create an instance of the class, giving as argument the PHP object
     // corresponding to the file field from the form
     // All the uploads are accessible from the PHP object $_FILES
-    $handle = new Upload($_FILES['my_field']);
+    $handle = new upload($_FILES['my_field']);
 
     // then we check if the file has been uploaded properly
     // in its *temporary* location in the server (often, it is /tmp)
@@ -171,8 +177,8 @@ if ($action == 'simple') {
 
         // now, we start the upload 'process'. That is, to copy the uploaded file
         // from its temporary location to the wanted location
-        // It could be something like $handle->Process('/home/www/my_uploads/');
-        $handle->Process($dir_dest);
+        // It could be something like $handle->process('/home/www/my_uploads/');
+        $handle->process($dir_dest);
 
         // we check if everything went OK
         if ($handle->processed) {
@@ -199,7 +205,7 @@ if ($action == 'simple') {
         $handle->image_reflection_height = '25%';
         $handle->image_contrast          = 50;
 
-        $handle->Process($dir_dest);
+        $handle->process($dir_dest);
 
         // we check if everything went OK
         if ($handle->processed) {
@@ -220,7 +226,7 @@ if ($action == 'simple') {
         }
 
         // we delete the temporary files
-        $handle-> Clean();
+        $handle-> clean();
 
     } else {
         // if we're here, the upload file failed for some reasons
@@ -231,6 +237,7 @@ if ($action == 'simple') {
         echo '</p>';
     }
 
+    $log .= $handle->log . '<br />';
 
 } else if ($action == 'xhr') {
 
@@ -241,13 +248,13 @@ if ($action == 'simple') {
 
         // we create an instance of the class, feeding in the name of the file
         // sent via a XMLHttpRequest request, prefixed with 'php:'
-        $handle = new Upload('php:'.$_SERVER['HTTP_X_FILE_NAME']);
+        $handle = new upload('php:'.$_SERVER['HTTP_X_FILE_NAME']);
 
     } else {
         // we create an instance of the class, giving as argument the PHP object
         // corresponding to the file field from the form
         // This is the fallback, using the standard way
-        $handle = new Upload($_FILES['my_field']);
+        $handle = new upload($_FILES['my_field']);
     }
 
     // then we check if the file has been uploaded properly
@@ -257,8 +264,8 @@ if ($action == 'simple') {
         // yes, the file is on the server
         // now, we start the upload 'process'. That is, to copy the uploaded file
         // from its temporary location to the wanted location
-        // It could be something like $handle->Process('/home/www/my_uploads/');
-        $handle->Process($dir_dest);
+        // It could be something like $handle->process('/home/www/my_uploads/');
+        $handle->process($dir_dest);
 
         // we check if everything went OK
         if ($handle->processed) {
@@ -277,7 +284,7 @@ if ($action == 'simple') {
         }
 
         // we delete the temporary files
-        $handle-> Clean();
+        $handle-> clean();
 
     } else {
         // if we're here, the upload file failed for some reasons
@@ -288,6 +295,7 @@ if ($action == 'simple') {
         echo '</p>';
     }
 
+    $log .= $handle->log . '<br />';
 
 } else if ($action == 'multiple') {
 
@@ -307,7 +315,7 @@ if ($action == 'simple') {
     foreach ($files as $file) {
 
         // we instanciate the class for each element of $file
-        $handle = new Upload($file);
+        $handle = new upload($file);
 
         // then we check if the file has been uploaded properly
         // in its *temporary* location in the server (often, it is /tmp)
@@ -315,8 +323,8 @@ if ($action == 'simple') {
 
             // now, we start the upload 'process'. That is, to copy the uploaded file
             // from its temporary location to the wanted location
-            // It could be something like $handle->Process('/home/www/my_uploads/');
-            $handle->Process($dir_dest);
+            // It could be something like $handle->process('/home/www/my_uploads/');
+            $handle->process($dir_dest);
 
             // we check if everything went OK
             if ($handle->processed) {
@@ -342,6 +350,8 @@ if ($action == 'simple') {
             echo '  Error: ' . $handle->error . '';
             echo '</p>';
         }
+
+        $log .= $handle->log . '<br />';
     }
 
 } else if ($action == 'local' || isset($_GET['file'])) {
@@ -353,7 +363,7 @@ if ($action == 'simple') {
     ini_set("max_execution_time",0);
 
     // we don't upload, we just send a local filename (image)
-    $handle = new Upload((isset($_POST['my_field']) ? $_POST['my_field'] : (isset($_GET['file']) ? $_GET['file'] : '')));
+    $handle = new upload((isset($_POST['my_field']) ? $_POST['my_field'] : (isset($_GET['file']) ? $_GET['file'] : '')));
 
     // then we check if the file has been "uploaded" properly
     // in our case, it means if the file is present on the local file system
@@ -364,7 +374,7 @@ if ($action == 'simple') {
         function TestProcess(&$handle, $title = 'test', $details='') {
             global $dir_pics, $dir_dest;
 
-            $handle->Process($dir_dest);
+            $handle->process($dir_dest);
 
             if ($handle->processed) {
                 echo '<fieldset class="classuploadphp">';
@@ -951,15 +961,14 @@ if ($action == 'simple') {
         echo '<b>local file error</b><br />';
         echo 'Error: ' . $handle->error . '';
     }
+
+    $log .= $handle->log . '<br />';
 }
 
 echo '<p class="result"><a href="index.html">do another test</a></p>';
 
-if (isset($handle)) {
-    echo '<pre>';
-    echo($handle->log);
-    echo '</pre>';
-}
+if ($log) echo '<pre>' . $log . '</pre>';
+
 ?>
 </body>
 
